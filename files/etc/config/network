@@ -1,0 +1,23 @@
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option packet_steering '1'
+
+config device
+	option name 'br-lan'
+
+config interface 'lan'
+	option device 'eth0'
+	option proto 'static'
+	option ipaddr '192.168.1.8'
+	option gateway '192.168.1.1'
+	option netmask '255.255.255.0'
+	list dns '192.168.1.1'
+	option ip6assign '60'
+	option dhcpv6 'disabled'
+	option ra 'disabled'
+	option ra_management '0'
