@@ -151,7 +151,7 @@ def run_imagebuilder(target: str, version: str, packages: str, files_dir: Path):
     output_dir.mkdir(exist_ok=True)
 
     docker_cmd = [
-        "docker", "run", "--rm",
+        "docker", "run", "--rm","--pull", "always",
         "-v", f"{files_dir}:/builder/files:ro",
         "-v", f"{output_dir}:/builder/bin/targets",
         "-e", f"PROFILE={target}",
