@@ -114,12 +114,13 @@ def build_config_file(base_options: list[str], format_name: str) -> Path:
 
 def run_diy_script(script_path: str):
     """Execute user customization script (P3TERX diy.sh pattern)."""
-    script = Path(script_path)
+    script = Path(script_path).resolve()
     if not script.exists():
         print(f"[INFO] No diy script found at {script_path}, skipping.")
         return
-    print(f"[INFO] Running customization script: {script_path}")
-    subprocess.run(["bash", str(script)], check=True, cwd=str(WORK_DIR))
+    print(f"[INFO] Running customization script: {script}")
+    repo_root = Path(__file__).resolve().parent.parent
+    subprocess.run(["bash", str(script)], check=True, cwd=str(repo_root))
 
 
 def prepare_files(src_dir: str) -> Path:
@@ -151,7 +152,7 @@ def run_imagebuilder(target: str, version: str, packages: str, files_dir: Path):
     output_dir.mkdir(exist_ok=True)
 
     docker_cmd = [
-        "docker", "run", "--rm","--pull", "always",
+        "docker", "run", "--rm", "--pull", "always",
         "-v", f"{files_dir}:/builder/files:ro",
         "-v", f"{output_dir}:/builder/bin/targets",
         "-e", f"PROFILE={target}",
