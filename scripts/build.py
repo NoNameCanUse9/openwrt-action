@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
+`#!/usr/bin/env python3
 """ImmortalWrt ImageBuilder - Build firmware via Docker."""
 
 import argparse
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -151,19 +152,17 @@ def run_imagebuilder(target: str, version: str, packages: str, files_dir: Path):
     output_dir = WORK_DIR / "output"
     output_dir.mkdir(exist_ok=True)
 
-    docker_cmd = [
-        "docker", "run", "--rm", "--pull", "always",
-        "-v", f"{files_dir}:/builder/files:ro",
-        "-v", f"{output_dir}:/builder/bin/targets",
-        "-e", f"PROFILE={target}",
-        "-e", f"PACKAGES={packages}",
-        "-e", "FILES=/builder/files",
-        image_tag,
-        "bash", "-c", "set -e && make image",
-    ]
+    docker_cmd = f"""docker run --rm --pull always \
+        -v {files_dir}:/builder/files:ro \
+        -v {output_dir}:/builder/bin/targets \
+        -e PROFILE={target} \
+        -e PACKAGES={shlex.quote(packages)} \
+        -e FILES=/builder/files \
+        {image_tag} \
+        bash -c 'set -e && make image'"""
 
-    print(f"[CMD] {' '.join(docker_cmd)}\n")
-    result = subprocess.run(docker_cmd)
+    print(f"[CMD] {docker_cmd}\n")
+    result = subprocess.run(docker_cmd, shell=True)
 
     if result.returncode != 0:
         print(f"\n[ERROR] Docker build failed with exit code {result.returncode}")
@@ -231,3 +230,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+`
